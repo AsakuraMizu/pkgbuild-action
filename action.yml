@@ -11,6 +11,10 @@ inputs:
   archive:
     description: 'Use Arch Linux Archive on the specified date.'
     required: false
+  updpkgsums:
+    description: 'Update the checksums in the PKGBUILD'
+    required: false
+    default: 'false'
 
 outputs:
   pkgfile:

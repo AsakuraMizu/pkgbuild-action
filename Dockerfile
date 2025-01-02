@@ -1,7 +1,7 @@
 FROM archlinux:base-devel
 
 RUN printf '[multilib]\nInclude = /etc/pacman.d/mirrorlist' >> /etc/pacman.conf
-RUN pacman -Syu --needed --noconfirm git
+RUN pacman -Syu --needed --noconfirm git pacman-contrib namcap
 
 RUN useradd -m build
 RUN echo "build ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers

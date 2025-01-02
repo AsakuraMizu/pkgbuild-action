@@ -36,6 +36,13 @@ cp -r "$abspath" .
 cd "$(basename "$abspath")"
 echo "::endgroup::"
 
+if [[ $INPUT_UPDPKGSUMS == true ]]; then
+    echo "::group::Update checksums"
+    updpkgsums
+    sudo cp PKGBUILD "$abspath"
+    echo "::endgroup::"
+fi
+
 echo "::group::Source PKGBUILD"
 source PKGBUILD
 echo "::endgroup::"
@@ -44,17 +51,9 @@ echo "::group::Install depends"
 paru -Syu --removemake --needed --noconfirm "${depends[@]}" "${makedepends[@]}"
 echo "::endgroup::"
 
-echo "::group::Remove paru and git"
-sudo pacman -Rns --noconfirm paru-bin git || true
-echo "::endgroup::"
-
-echo "::group::List all installed packages"
-pacman -Q
-echo "::endgroup::"
-
 echo "::group::Make package"
 logfile=$(mktemp)
-makepkg -s --noconfirm 2>&1 | tee "$logfile"
+makepkg -cfs --noconfirm 2>&1 | tee "$logfile"
 warn="$(grep WARNING "$logfile" || true)"
 outputwarning "$warn"
 echo "::endgroup::"
@@ -66,10 +65,6 @@ pkgfile="${files[0]}"
 echo "pkgfile=${pkgfile}" | sudo tee -a "$GITHUB_OUTPUT"
 pacman -Qip "${pkgfile}"
 pacman -Qlp "${pkgfile}"
-echo "::endgroup::"
-
-echo "::group::Install namcap"
-sudo pacman -S --needed --noconfirm namcap
 echo "::endgroup::"
 
 echo "::group::Run namcap checks"
